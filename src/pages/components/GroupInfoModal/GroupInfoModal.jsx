@@ -4,7 +4,8 @@ import './GroupInfoModal.css';
 export default function GroupInfoModal({ group, onClose }) {
     if (!group) return null;
 
-    const members = group.members || [];
+    // ✅ Handle different member structures (direct user object or nested in .user)
+    const members = (group.members || []).map(m => m.user || m);
 
     // Get avatar URL for a member
     const getAvatarUrl = (member) => {
@@ -59,14 +60,15 @@ export default function GroupInfoModal({ group, onClose }) {
                                             alt={member.username || 'User'}
                                             className="member-avatar"
                                             onError={(e) => {
-                                                const initials = `${member?.first_name?.[0] || 'U'}${member?.last_name?.[0] || ''}`;
+                                                const firstName = member?.first_name || member?.username || 'U';
+                                                const lastName = member?.last_name || '';
+                                                const initials = `${firstName[0]}${lastName[0] || ''}`;
                                                 e.target.src = `https://ui-avatars.com/api/?name=${initials}&background=667eea&color=fff`;
                                             }}
                                         />
                                         <div className="member-info">
                                             <p className="member-name">
-                                                {member.first_name || member.username || 'Unknown'}
-                                                {member.last_name && ` ${member.last_name}`}
+                                                {member.first_name ? `${member.first_name} ${member.last_name || ''}` : (member.username || 'Unknown User')}
                                             </p>
                                             <p className="member-username">@{member.username || 'unknown'}</p>
                                         </div>
