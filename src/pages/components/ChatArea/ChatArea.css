@@ -148,6 +148,13 @@
     color: #94a3b8;
 }
 
+/* Message Group Wrapper */
+.chat-message-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 /* Messages */
 .chat-message {
     display: flex;
@@ -172,15 +179,17 @@
 }
 
 .chat-message.received {
-    align-self: flex-start;
+    margin-right: auto;
     background: #1e293b;
     border: 1px solid #334155;
+    border-top-left-radius: 0;
 }
 
 .chat-message.sent {
-    align-self: flex-end;
+    margin-left: auto;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    border-top-right-radius: 0;
 }
 
 .chat-message.temporary {

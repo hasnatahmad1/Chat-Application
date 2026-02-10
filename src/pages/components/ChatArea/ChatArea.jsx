@@ -328,14 +328,16 @@ export default function ChatArea({
                 ) : (
                     // Messages List
                     messages.map((msg, index) => {
-                        const isCurrentUser = msg.sender_id === currentUserId;
+                        // ✅ Handle both flat sender_id and nested sender.id object
+                        const messageSenderId = msg.sender_id || msg.sender?.id;
+                        const isCurrentUser = messageSenderId == currentUserId;
                         const showDate =
                             index === 0 ||
                             formatDate(messages[index - 1].created_at) !==
                             formatDate(msg.created_at);
 
                         return (
-                            <div key={msg.id || index}>
+                            <div key={msg.id || index} className="chat-message-group">
                                 {showDate && (
                                     <div className="chat-date-separator">
                                         <span>{formatDate(msg.created_at)}</span>
