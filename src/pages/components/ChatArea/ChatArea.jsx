@@ -287,12 +287,6 @@ export default function ChatArea({
                 </div>
 
                 <div className="chat-header-actions">
-                    <button className="chat-action-btn" title="Call">
-                        <Phone size={20} />
-                    </button>
-                    <button className="chat-action-btn" title="Video call">
-                        <Video size={20} />
-                    </button>
                     {type === 'group' && (
                         <button
                             className="chat-action-btn"
