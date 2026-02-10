@@ -243,18 +243,6 @@ export function Home() {
                 </div>
 
                 <div className="home-header-right">
-                    {/* Search */}
-                    <div className="home-search-box">
-                        <Search size={18} className="search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search messages..."
-                            className="home-search-input"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-
                     {/* Action Buttons */}
                     <button
                         className="home-action-btn"
