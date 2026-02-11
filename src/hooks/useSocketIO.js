@@ -19,6 +19,7 @@ export function useSocketIO(serverUrl, token) {
     const [currentRoom, setCurrentRoom] = useState(null);
     const [typingUsers, setTypingUsers] = useState([]);
     const [onlineUsers, setOnlineUsers] = useState(new Set());
+    const [newGroup, setNewGroup] = useState(null);
 
     // ✅ Initialize Socket.IO connection
     useEffect(() => {
@@ -64,12 +65,12 @@ export function useSocketIO(serverUrl, token) {
 
         // ✅ Room events
         socket.on('joined_group', (data) => {
-            console.log('✅ Joined group:', data);
+            console.log('✅ Joined group socket room:', data);
             setCurrentRoom({ type: 'group', id: data.group_id });
         });
 
         socket.on('joined_direct_chat', (data) => {
-            console.log('✅ Joined direct chat:', data);
+            console.log('✅ Joined direct chat socket room:', data);
             setCurrentRoom({ type: 'direct', id: data.other_user_id });
         });
 
@@ -82,6 +83,11 @@ export function useSocketIO(serverUrl, token) {
         socket.on('direct_message', (data) => {
             console.log('📨 Direct message received:', data);
             setMessages(prev => [...prev, { ...data, type: 'direct' }]);
+        });
+
+        socket.on('group_created', (data) => {
+            console.log('📂 Group created notification received:', data);
+            setNewGroup(data);
         });
 
         // ✅ Initial online users list
@@ -254,6 +260,8 @@ export function useSocketIO(serverUrl, token) {
         joinDirectChat,
         leaveDirectChat,
         onlineUsers,
+        newGroup,
+        setNewGroup,
         sendGroupMessage,
         sendDirectMessage,
         sendTyping,

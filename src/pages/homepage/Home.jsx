@@ -13,6 +13,7 @@ export function Home() {
     const token = localStorage.getItem('access_token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const navigate = useNavigate();
+    console.log('🏠 Home mounted. Current User ID:', user.id, 'Username:', user.username);
 
     // ✅ Socket.IO Hook
     const {
@@ -20,6 +21,8 @@ export function Home() {
         messages: socketMessages,
         typingUsers,
         onlineUsers: socketOnlineUsers,
+        newGroup,
+        setNewGroup,
         joinGroup,
         leaveGroup,
         joinDirectChat,
@@ -86,6 +89,87 @@ export function Home() {
             fetchConversations();
         }
     }, [token]);
+
+    // ✅ Update sidebar on new socket messages
+    useEffect(() => {
+        if (!socketMessages || socketMessages.length === 0) return;
+
+        const lastMsg = socketMessages[socketMessages.length - 1];
+        console.log('📱 Updating sidebar for message:', lastMsg);
+
+        if (lastMsg.type === 'direct') {
+            const otherUserId = lastMsg.sender_id == user.id ? lastMsg.receiver_id : lastMsg.sender_id;
+
+            setConversations(prev => {
+                const next = [...prev];
+                const index = next.findIndex(c => c.id == otherUserId);
+
+                if (index !== -1) {
+                    const updatedConv = {
+                        ...next[index],
+                        last_message: {
+                            message: lastMsg.message,
+                            created_at: lastMsg.created_at,
+                            sender_id: lastMsg.sender_id
+                        }
+                    };
+                    // Remove from old position and move to top
+                    next.splice(index, 1);
+                    return [updatedConv, ...next];
+                } else {
+                    // If it's a completely new conversation, it's better to refresh the list
+                    // to get full user details from the backend
+                    fetchConversations();
+                    return prev;
+                }
+            });
+        } else if (lastMsg.type === 'group') {
+            const groupId = lastMsg.group || lastMsg.group_id;
+
+            setGroups(prev => {
+                const next = [...prev];
+                const index = next.findIndex(g => g.id == groupId);
+
+                if (index !== -1) {
+                    const updatedGroup = {
+                        ...next[index],
+                        updated_at: lastMsg.created_at
+                        // We could also add last_message to groups if we want to show it
+                    };
+                    // Remove and move to top
+                    next.splice(index, 1);
+                    return [updatedGroup, ...next];
+                } else {
+                    fetchGroups();
+                    return prev;
+                }
+            });
+        }
+    }, [socketMessages]);
+
+    // ✅ Handle new group notifications via socket
+    useEffect(() => {
+        if (newGroup) {
+            console.log('📂 Processing new group notification:', newGroup);
+
+            // Add to groups list if not already there
+            setGroups(prev => {
+                if (!prev.find(g => g.id === newGroup.id)) {
+                    return [newGroup, ...prev];
+                }
+                return prev;
+            });
+
+            // Automatically join the room for this group
+            if (isConnected) {
+                console.log(`🚪 Joining room for new group: ${newGroup.id}`);
+                joinGroup(newGroup.id);
+            }
+
+            // Clear the notification
+            setNewGroup(null);
+        }
+    }, [newGroup, isConnected, joinGroup, setNewGroup]);
 
     // ✅ Fetch groups from API
     const fetchGroups = async () => {
@@ -243,11 +327,26 @@ export function Home() {
     };
 
     // ✅ Handle create group success
-    const handleGroupCreated = (newGroup) => {
-        setGroups(prev => [newGroup, ...prev]);
+    const handleGroupCreated = (newGroupData) => {
+        setGroups(prev => [newGroupData, ...prev]);
         setShowCreateGroupModal(false);
-        setSelectedGroup(newGroup);
+        setSelectedGroup(newGroupData);
         setSelectedUser(null);
+
+        // ✅ Notify other members via socket
+        if (socket && isConnected) {
+            const memberIds = newGroupData.members?.map(m => m.user.id) || [];
+            console.log('📤 Emitting new_group to members:', memberIds);
+            socket.emit('new_group', {
+                group: newGroupData,
+                member_ids: memberIds
+            }, (ack) => {
+                console.log('✅ Server acknowledged new_group emission:', ack);
+            });
+
+            // Join the room for the group we just created
+            joinGroup(newGroupData.id);
+        }
     };
 
     // ✅ Handle start conversation
