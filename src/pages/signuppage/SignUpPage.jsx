@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import axios from 'axios';
 import { Mail, Lock, User, Upload, Loader, Eye, EyeOff } from 'lucide-react';
-import './SignupPage.css';
+import './SignUpPage.css';
 
 export function SignUpPage() {
     const navigate = useNavigate();
