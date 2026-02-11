@@ -65,12 +65,10 @@ export function useSocketIO(serverUrl, token) {
 
         // ✅ Room events
         socket.on('joined_group', (data) => {
-            console.log('✅ Joined group socket room:', data);
             setCurrentRoom({ type: 'group', id: data.group_id });
         });
 
         socket.on('joined_direct_chat', (data) => {
-            console.log('✅ Joined direct chat socket room:', data);
             setCurrentRoom({ type: 'direct', id: data.other_user_id });
         });
 

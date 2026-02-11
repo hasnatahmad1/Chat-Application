@@ -13,7 +13,6 @@ export function Home() {
     const token = localStorage.getItem('access_token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const navigate = useNavigate();
-    console.log('🏠 Home mounted. Current User ID:', user.id, 'Username:', user.username);
 
     // ✅ Socket.IO Hook
     const {
@@ -38,7 +37,6 @@ export function Home() {
     // ✅ Update online users from socket
     useEffect(() => {
         if (socketOnlineUsers) {
-            console.log('🔄 Syncing online users from socket:', Array.from(socketOnlineUsers));
             setOnlineUsers(prev => {
                 const newSet = new Set(prev);
 
@@ -51,7 +49,6 @@ export function Home() {
                 if (isConnected) {
                     prev.forEach(userId => {
                         if (!socketOnlineUsers.has(userId)) {
-                            console.log(`Removing user ${userId} from online set (offline)`);
                             newSet.delete(userId);
                         }
                     });
@@ -95,7 +92,6 @@ export function Home() {
         if (!socketMessages || socketMessages.length === 0) return;
 
         const lastMsg = socketMessages[socketMessages.length - 1];
-        console.log('📱 Updating sidebar for message:', lastMsg);
 
         if (lastMsg.type === 'direct') {
             const otherUserId = lastMsg.sender_id == user.id ? lastMsg.receiver_id : lastMsg.sender_id;
@@ -150,8 +146,6 @@ export function Home() {
     // ✅ Handle new group notifications via socket
     useEffect(() => {
         if (newGroup) {
-            console.log('📂 Processing new group notification:', newGroup);
-
             // Add to groups list if not already there
             setGroups(prev => {
                 if (!prev.find(g => g.id === newGroup.id)) {
@@ -162,7 +156,6 @@ export function Home() {
 
             // Automatically join the room for this group
             if (isConnected) {
-                console.log(`🚪 Joining room for new group: ${newGroup.id}`);
                 joinGroup(newGroup.id);
             }
 
@@ -269,7 +262,6 @@ export function Home() {
         } finally {
             // ✅ Explicitly disconnect socket on logout
             if (socket) {
-                console.log('🔌 Manually disconnecting socket on logout');
                 socket.disconnect();
             }
             localStorage.removeItem('access_token');
@@ -336,12 +328,9 @@ export function Home() {
         // ✅ Notify other members via socket
         if (socket && isConnected) {
             const memberIds = newGroupData.members?.map(m => m.user.id) || [];
-            console.log('📤 Emitting new_group to members:', memberIds);
             socket.emit('new_group', {
                 group: newGroupData,
                 member_ids: memberIds
-            }, (ack) => {
-                console.log('✅ Server acknowledged new_group emission:', ack);
             });
 
             // Join the room for the group we just created
