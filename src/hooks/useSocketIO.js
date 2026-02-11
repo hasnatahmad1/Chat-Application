@@ -39,11 +39,6 @@ export function useSocketIO(serverUrl, token) {
 
         const socket = socketRef.current;
 
-        // ✅ DEBUG: Catch-all listener
-        socket.onAny((eventName, ...args) => {
-            console.log(`🔌 Catch-all: Received event "${eventName}"`, args);
-        });
-
         // ✅ Connection events
         socket.on('connect', () => {
             console.log('✅ Socket.IO connected:', socket.id);

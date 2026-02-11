@@ -189,40 +189,12 @@ export default function ChatArea({
             }
         }
 
-        // ✅ Add temporary message to UI for instant feedback
-        const tempMessage = {
-            id: `temp-${Date.now()}`,
-            message: messageText,
-            sender: currentUser?.username || 'You',
-            sender_id: currentUser?.id,
-            created_at: new Date().toISOString(),
-            isTemporary: true,
-        };
-
-        console.log('📝 Adding temporary message:', tempMessage);
-        setMessages(prev => {
-            const next = [...prev, tempMessage];
-            console.log('📊 Local messages state after temp add:', next.length);
-            return next;
-        });
-
         // ✅ Send via Socket.IO
-        console.log(`📤 Emitting send via onSendMessage (${type}, ${data.id})`);
         const success = onSendMessage(type, data.id, messageText);
 
         if (!success) {
-            console.error('❌ onSendMessage returned false');
             setError('Failed to send message');
             setMessageInput(messageText); // Restore input
-            // Remove temporary message
-            setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
-        } else {
-            console.log('✅ onSendMessage successful. Setting 2s timeout for temp removal.');
-            // Remove temporary message after a delay (real message will come via socket)
-            setTimeout(() => {
-                console.log('⏱️ Removing temporary message:', tempMessage.id);
-                setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
-            }, 2000);
         }
     };
 
