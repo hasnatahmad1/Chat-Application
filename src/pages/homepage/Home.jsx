@@ -35,13 +35,29 @@ export function Home() {
     // ✅ Update online users from socket
     useEffect(() => {
         if (socketOnlineUsers) {
+            console.log('🔄 Syncing online users from socket:', Array.from(socketOnlineUsers));
             setOnlineUsers(prev => {
                 const newSet = new Set(prev);
+
+                // Add users from socket
                 socketOnlineUsers.forEach(userId => newSet.add(userId));
+
+                // If socket is connected, it's the source of truth. 
+                // Any user in our state NOT in socketOnlineUsers should be removed.
+                // Note: We only do this if we have received at least one list from socket.
+                if (isConnected) {
+                    prev.forEach(userId => {
+                        if (!socketOnlineUsers.has(userId)) {
+                            console.log(`Removing user ${userId} from online set (offline)`);
+                            newSet.delete(userId);
+                        }
+                    });
+                }
+
                 return newSet;
             });
         }
-    }, [socketOnlineUsers]);
+    }, [socketOnlineUsers, isConnected]);
 
     // ✅ States
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -167,6 +183,11 @@ export function Home() {
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
+            // ✅ Explicitly disconnect socket on logout
+            if (socket) {
+                console.log('🔌 Manually disconnecting socket on logout');
+                socket.disconnect();
+            }
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');
