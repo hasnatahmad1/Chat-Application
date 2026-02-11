@@ -14,6 +14,7 @@ export default function Sidebar({
     searchQuery = '',
     onCreateGroup,
     onNewMessage,
+    onlineUsers,
 }) {
     const [activeTab, setActiveTab] = useState('groups'); // 'groups' or 'dms'
     const [localSearch, setLocalSearch] = useState(searchQuery);
@@ -234,6 +235,9 @@ export default function Sidebar({
                                     >
                                         <div className="sidebar-item-avatar user-avatar">
                                             {getConversationAvatar(conv)}
+                                            {onlineUsers?.has(conv.id) && (
+                                                <span className="sidebar-online-indicator"></span>
+                                            )}
                                         </div>
                                         <div className="sidebar-item-content">
                                             <div className="sidebar-item-header">

@@ -19,6 +19,7 @@ export function Home() {
         isConnected,
         messages: socketMessages,
         typingUsers,
+        onlineUsers: socketOnlineUsers,
         joinGroup,
         leaveGroup,
         joinDirectChat,
@@ -27,6 +28,20 @@ export function Home() {
         sendDirectMessage,
         socket,
     } = useSocketIO('http://127.0.0.1:8001', token);
+
+    // ✅ Merged Online Users State (API + Socket)
+    const [onlineUsers, setOnlineUsers] = useState(new Set());
+
+    // ✅ Update online users from socket
+    useEffect(() => {
+        if (socketOnlineUsers) {
+            setOnlineUsers(prev => {
+                const newSet = new Set(prev);
+                socketOnlineUsers.forEach(userId => newSet.add(userId));
+                return newSet;
+            });
+        }
+    }, [socketOnlineUsers]);
 
     // ✅ States
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -102,6 +117,20 @@ export function Home() {
             }));
 
             setConversations(formattedConversations);
+
+            // ✅ Initialize online users from API data
+            const initialOnlineUsers = new Set();
+            conversationsData.forEach(conv => {
+                if (conv.other_user?.is_online) {
+                    initialOnlineUsers.add(conv.other_user.id);
+                }
+            });
+
+            setOnlineUsers(prev => {
+                const newSet = new Set(prev);
+                initialOnlineUsers.forEach(id => newSet.add(id));
+                return newSet;
+            });
         } catch (error) {
             console.error('Error fetching conversations:', error);
             setConversations([]);
@@ -335,6 +364,7 @@ export function Home() {
                     searchQuery={searchQuery}
                     onCreateGroup={() => setShowCreateGroupModal(true)}
                     onNewMessage={() => setShowSearchUsersModal(true)}
+                    onlineUsers={onlineUsers}
                 />
 
                 {/* Chat Area */}
@@ -351,6 +381,7 @@ export function Home() {
                         onSendMessage={handleSendMessage}
                         socketMessages={socketMessages}
                         typingUsers={typingUsers}
+                        onlineUsers={onlineUsers}
                     />
                 ) : selectedUser ? (
                     <ChatArea
@@ -365,6 +396,7 @@ export function Home() {
                         onSendMessage={handleSendMessage}
                         socketMessages={socketMessages}
                         typingUsers={typingUsers}
+                        onlineUsers={onlineUsers}
                     />
                 ) : (
                     <div className="home-empty-state">

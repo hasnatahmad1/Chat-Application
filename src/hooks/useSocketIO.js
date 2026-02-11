@@ -18,6 +18,7 @@ export function useSocketIO(serverUrl, token) {
     const [error, setError] = useState(null);
     const [currentRoom, setCurrentRoom] = useState(null);
     const [typingUsers, setTypingUsers] = useState([]);
+    const [onlineUsers, setOnlineUsers] = useState(new Set());
 
     // ✅ Initialize Socket.IO connection
     useEffect(() => {
@@ -83,7 +84,29 @@ export function useSocketIO(serverUrl, token) {
             setMessages(prev => [...prev, { ...data, type: 'direct' }]);
         });
 
+        // ✅ Initial online users list
+        socket.on('online_users_list', (data) => {
+            console.log('📋 Received online users list:', data.user_ids);
+            setOnlineUsers(new Set(data.user_ids));
+        });
+
         // ✅ User status events
+        socket.on('user_status_change', (data) => {
+            console.log('👤 User status changed (Hook):', data);
+            setOnlineUsers(prev => {
+                const newSet = new Set(prev);
+                if (data.is_online) {
+                    console.log(`Adding user ${data.user_id} to online set`);
+                    newSet.add(data.user_id);
+                } else {
+                    console.log(`Removing user ${data.user_id} from online set`);
+                    newSet.delete(data.user_id);
+                }
+                console.log('Updated Online Users Set:', Array.from(newSet));
+                return newSet;
+            });
+        });
+
         socket.on('user_joined', (data) => {
             console.log('👤 User joined:', data);
         });
@@ -230,6 +253,7 @@ export function useSocketIO(serverUrl, token) {
         leaveGroup,
         joinDirectChat,
         leaveDirectChat,
+        onlineUsers,
         sendGroupMessage,
         sendDirectMessage,
         sendTyping,

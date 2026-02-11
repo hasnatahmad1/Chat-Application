@@ -15,7 +15,8 @@ export default function ChatArea({
     onLeaveRoom,
     onSendMessage,
     socketMessages,
-    typingUsers
+    typingUsers,
+    onlineUsers
 }) {
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
@@ -282,7 +283,7 @@ export default function ChatArea({
                     <p className="chat-subtitle">
                         {type === 'group'
                             ? `${data?.members?.length || 0} members`
-                            : isConnected ? '🟢 Online' : '🔴 Offline'}
+                            : onlineUsers?.has(data?.id) ? '🟢 Online' : '🔴 Offline'}
                     </p>
                 </div>
 
