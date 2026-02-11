@@ -60,7 +60,8 @@ export default function ChatArea({
                 // Check if message belongs to current chat (handle both 'group' and 'group_id')
                 const isForCurrentChat = type === 'group'
                     ? (socketMsg.group === data?.id || socketMsg.group_id === data?.id)
-                    : (socketMsg.sender_id === data?.id || socketMsg.receiver_id === data?.id);
+                    : (socketMsg.sender_id === data?.id || socketMsg.receiver_id === data?.id ||
+                        socketMsg.sender?.id === data?.id || socketMsg.receiver?.id === data?.id);
 
                 if (isForCurrentChat) {
                     setMessages(prev => {
@@ -160,12 +161,14 @@ export default function ChatArea({
     // ✅ Handle message send
     const handleSendMessage = async (e) => {
         e.preventDefault();
+        console.log('🚀 handleSendMessage triggered. Input:', messageInput);
 
         if (!messageInput.trim()) {
             return;
         }
 
         if (!isConnected) {
+            console.warn('⚠️ Cannot send: socket not connected');
             setError('Not connected. Please wait...');
             setTimeout(() => setError(null), 3000);
             return;
@@ -196,21 +199,30 @@ export default function ChatArea({
             isTemporary: true,
         };
 
-        setMessages(prev => [...prev, tempMessage]);
+        console.log('📝 Adding temporary message:', tempMessage);
+        setMessages(prev => {
+            const next = [...prev, tempMessage];
+            console.log('📊 Local messages state after temp add:', next.length);
+            return next;
+        });
 
         // ✅ Send via Socket.IO
+        console.log(`📤 Emitting send via onSendMessage (${type}, ${data.id})`);
         const success = onSendMessage(type, data.id, messageText);
 
         if (!success) {
+            console.error('❌ onSendMessage returned false');
             setError('Failed to send message');
             setMessageInput(messageText); // Restore input
             // Remove temporary message
             setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
         } else {
+            console.log('✅ onSendMessage successful. Setting 2s timeout for temp removal.');
             // Remove temporary message after a delay (real message will come via socket)
             setTimeout(() => {
+                console.log('⏱️ Removing temporary message:', tempMessage.id);
                 setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
-            }, 1000);
+            }, 2000);
         }
     };
 
