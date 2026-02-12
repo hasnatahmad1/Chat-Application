@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
  * 
  * Usage:
  * const { socket, isConnected, messages, sendMessage, joinRoom, leaveRoom } = useSocketIO(
- *   'http://127.0.0.1:8001',
+ *   'http://127.0.0.1:8000', // same port as Django backend
  *   token
  * );
  */

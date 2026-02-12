@@ -29,7 +29,7 @@ export function Home() {
         sendGroupMessage,
         sendDirectMessage,
         socket,
-    } = useSocketIO('http://127.0.0.1:8001', token);
+    } = useSocketIO('http://127.0.0.1:8000', token);
 
     // ✅ Merged Online Users State (API + Socket)
     const [onlineUsers, setOnlineUsers] = useState(new Set());
