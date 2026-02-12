@@ -93,19 +93,21 @@ export default function ChatArea({
 
             if (type === 'group') {
                 response = await axios.get(
-                    `http://127.0.0.1:8000/api/group-messages/group_messages/?group_id=${data.id}`,
+                    `https://yousef-frizzliest-myah.ngrok-free.dev/api/group-messages/group_messages/?group_id=${data.id}`,
                     {
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}`,
+                            "ngrok-skip-browser-warning": "true"
                         }
                     }
                 );
             } else if (type === 'direct') {
                 response = await axios.get(
-                    `http://127.0.0.1:8000/api/direct-messages/conversation/?user_id=${data.id}`,
+                    `https://yousef-frizzliest-myah.ngrok-free.dev/api/direct-messages/conversation/?user_id=${data.id}`,
                     {
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}`,
+                            "ngrok-skip-browser-warning": "true"
                         }
                     }
                 );

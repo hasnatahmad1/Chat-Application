@@ -23,10 +23,11 @@ export default function CreateGroupModal({ token, onClose, onGroupCreated }) {
             setIsSearching(true);
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/api/users/search_users/?q=${searchQuery}`,
+                    `https://yousef-frizzliest-myah.ngrok-free.dev/api/users/search_users/?q=${searchQuery}`,
                     {
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}`,
+                            "ngrok-skip-browser-warning": "true"
                         }
                     }
                 );
@@ -73,14 +74,15 @@ export default function CreateGroupModal({ token, onClose, onGroupCreated }) {
 
         try {
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/groups/',
+                'https://yousef-frizzliest-myah.ngrok-free.dev/api/groups/',
                 {
                     name: groupName.trim(),
                     member_ids: selectedMembers.map(m => m.id)
                 },
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        "ngrok-skip-browser-warning": "true"
                     }
                 }
             );

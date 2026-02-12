@@ -143,11 +143,12 @@ export function SignUpPage() {
             }
 
             const response = await axios.post(
-                `http://localhost:8000/api/auth/signup/`,
+                `https://yousef-frizzliest-myah.ngrok-free.dev/api/auth/signup/`,
                 submitData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
+                        "ngrok-skip-browser-warning": "true"
                     },
                 }
             );

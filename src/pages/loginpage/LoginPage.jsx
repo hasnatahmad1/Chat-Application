@@ -65,7 +65,7 @@ export function LoginPage() {
 
         try {
             const response = await axios.post(
-                `http://localhost:8000/api/auth/login/`,
+                `https://yousef-frizzliest-myah.ngrok-free.dev/api/auth/login/`,
                 {
                     username: formData.username,
                     password: formData.password,

@@ -29,7 +29,7 @@ export function Home() {
         sendGroupMessage,
         sendDirectMessage,
         socket,
-    } = useSocketIO('http://127.0.0.1:8000', token);
+    } = useSocketIO('https://yousef-frizzliest-myah.ngrok-free.dev', token);
 
     // ✅ Merged Online Users State (API + Socket)
     const [onlineUsers, setOnlineUsers] = useState(new Set());
@@ -168,10 +168,11 @@ export function Home() {
     const fetchGroups = async () => {
         try {
             const response = await axios.get(
-                'http://127.0.0.1:8000/api/groups/',
+                'https://yousef-frizzliest-myah.ngrok-free.dev/api/groups/',
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        "ngrok-skip-browser-warning": "true"
                     }
                 }
             );
@@ -194,10 +195,11 @@ export function Home() {
     const fetchConversations = async () => {
         try {
             const response = await axios.get(
-                'http://127.0.0.1:8000/api/direct-messages/',
+                'https://yousef-frizzliest-myah.ngrok-free.dev/api/direct-messages/',
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        "ngrok-skip-browser-warning": "true"
                     }
                 }
             );
@@ -249,11 +251,12 @@ export function Home() {
     const handleLogout = async () => {
         try {
             await axios.post(
-                'http://127.0.0.1:8000/api/auth/logout/',
+                'https://yousef-frizzliest-myah.ngrok-free.dev/api/auth/logout/',
                 {},
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        "ngrok-skip-browser-warning": "true"
                     }
                 }
             );
